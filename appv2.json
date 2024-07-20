@@ -1,0 +1,887 @@
+{
+  "meta": {
+    "instanceId": "d102396db5484ae5f2c74878bd7e78c14986a880d4ae36aa99666b1a0badfa4c"
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "290e9393-25e7-4bbc-b37a-47074671e0c0",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        2840,
+        1080
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputData = items[0].json.data.content;\n\nconst transformedData = inputData.map(item => {\n  return {\n    country: item.country,\n    oasysCategoryId: item.oasysCategoryId,\n    isGST: item.isGST,\n    locationType: item.locationType,\n    cityId: item.cityId,\n    source: item.source,\n    pricingId: item.pricingId,\n    lastUpdated: item.lastUpdated,\n    score: item.score,\n    uom: item.uom,\n    additionalParameterId: item.additionalParameterId,\n    visibilityFilter: item.visibilityFilter,\n    price: item.price,\n    state: item.state,\n    remarkId: item.remarkId,\n    oasysProductId: item.oasysProductId,\n    brand: item.brand,\n    slug: item.slug,\n    basePrice: item.basePrice,\n    priceChange: item.priceChange,\n    image: item.image,\n    productId: item.productId,\n    index: item.index,\n    productSlug: item.productSlug,\n    categorySlug: item.categorySlug,\n    plantType: item.plantType,\n    tags: item.tags,\n    uniqueName: item.uniqueName,\n    brandId: item.brandId,\n    grade: item.grade,\n    region: item.region,\n    mandiSubtype: item.mandiSubtype,\n    distance: item.distance,\n    city: item.city,\n    displayName: item.displayName,\n    canOrder: item.canOrder,\n    enabled: item.enabled,\n    mandiType: item.mandiType,\n    expiryDate: item.expiryDate,\n    maskedPrice: item.maskedPrice,\n    currency: item.currency,\n    productType: item.productType,\n    priceChangePercent: item.priceChangePercent,\n    live: item.live,\n    product: item.product,\n    gradeId: item.gradeId,\n    currencySymbol: item.currencySymbol,\n    longLoc: item.longLoc,\n    followed: item.followed,\n    productTypeId: item.productTypeId,\n    latLoc: item.latLoc,\n    additionalParameters: item.additionalParameters,\n    category: item.category,\n    categoryId: item.categoryId,\n    remarks: item.remarks,\n    pricingType: item.pricingType\n  };\n});\n\nreturn transformedData.map(data => ({ json: data }));\n"
+      },
+      "id": "cfde5296-bd08-4501-a15f-d73fb0af52df",
+      "name": "Transform Data3",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        2260,
+        1580
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ad85887e-3ade-4262-80b6-49b64d950ca9",
+              "name": "Name",
+              "value": "={{ $json.displayName }}",
+              "type": "string"
+            },
+            {
+              "id": "4922fd1b-4dbc-4a1b-8cbd-340c346addc1",
+              "name": "Price",
+              "value": "={{ $json.basePrice }}",
+              "type": "number"
+            },
+            {
+              "id": "e80633db-b666-44af-9815-ed4aea3c0d7a",
+              "name": "Location",
+              "value": "={{ $json.city }}",
+              "type": "string"
+            },
+            {
+              "id": "bf720d77-cccf-4293-aebf-bcbdd3835d85",
+              "name": "Percent Change",
+              "value": "={{ $json.priceChangePercent }}",
+              "type": "string"
+            },
+            {
+              "id": "481275b0-438a-4bfa-b7cd-36cdf266a92a",
+              "name": "Price Change",
+              "value": "={{ $json.basePrice }}",
+              "type": "string"
+            },
+            {
+              "id": "82966dda-ddbf-4851-8bf6-4c12ddcc241e",
+              "name": "UOM",
+              "value": "={{ $json.uom }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7f9d28ba-5669-4d9c-874a-894d2bc45bcb",
+      "name": "Edit Fields3",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2500,
+        1580
+      ]
+    },
+    {
+      "parameters": {
+        "model": "llama3-70b-8192",
+        "options": {
+          "temperature": 0
+        },
+        "requestOptions": {}
+      },
+      "id": "d8942a29-f7ca-4688-9ce3-35b44b074a64",
+      "name": "Groq Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        640,
+        1520
+      ],
+      "credentials": {
+        "groqApi": {
+          "id": "e9evZGkr7935SZOV",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://stg3-bheem.ofbusiness.co.in/api/v2/pricing/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ $json.output.product }}"
+            },
+            {
+              "name": "city",
+              "value": "={{ $json.output.city }}"
+            },
+            {
+              "name": "pageNumber",
+              "value": "0"
+            },
+            {
+              "name": "pageSize",
+              "value": "3"
+            },
+            {
+              "name": "brand",
+              "value": "={{ $json.output.brand }}"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "id": "4d6e19e3-ddbf-49ca-8ae7-d04c03329d08",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2040,
+        1580
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Initialize an empty string to store the formatted output\nlet formattedOutput = \"\\n\";\n\n// Loop over input items and format each one\nfor (const item of $input.all()) {\n  const json = item.json;\n  \n  // Format the price change and percent change\n  const priceChange = json[\"Price Change\"] || \"0\";\n  const percentChange = json[\"Percent Change\"] || \"0\";\n  \n  // Create the formatted string for this item\n  const formattedItem = `${json.Name}\\n${json.Price}/${json.UOM},(${percentChange}% | ${priceChange})\\n${json.Location}\\n\\n`;\n  \n  // Append to the formatted output string\n  formattedOutput += formattedItem;\n}\n\n// Create the final output object\nconst output = [{\n  \"output\": formattedOutput\n}];\n\n// Return the output\nreturn output;"
+      },
+      "id": "f756124e-6294-479d-adee-824f1f4567ef",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2700,
+        1580
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "c95ea3ac-2c02-46b3-adc8-2247cf29f45d",
+              "leftValue": "={{ $json.output.product }}",
+              "rightValue": "C",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "8d3c227f-b064-4233-8ecb-fcab891cd0fa",
+              "leftValue": "={{ $json.output.city }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "f99bbd2a-c9be-4ea9-a523-0d6f14164fec",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        1140
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the input data from the previous node\nconst items = $input.all();\n\n// Transform the input array\nconst output = items.map(item => {\n  return {\n    \"output\": item.json.text\n  };\n});\n\n// Return the transformed data\nreturn output;\n"
+      },
+      "id": "edd40b7d-f1d6-4063-8ece-9c15c59e1b3d",
+      "name": "Code2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2540,
+        580
+      ]
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 3,
+        "requestOptions": {}
+      },
+      "id": "c0d93076-3537-4cdd-a64e-c2cbd89fe05f",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        1100,
+        1260
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2e32e191-ff58-4524-a4f6-47fe4a823c57",
+              "name": "Intent",
+              "value": "={{ $json.output.intent }}",
+              "type": "string"
+            },
+            {
+              "id": "131c8449-e17d-4126-8027-3b4c485d96eb",
+              "name": "input",
+              "value": "={{ $json.output.input }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6181f813-5aa8-4a20-b0c9-134b0618d403",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -100,
+        960
+      ]
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \n  \"input\": \"I want to become a supplier\",\n  \"intent\": \"become_supplier\"\n\n}",
+        "requestOptions": {}
+      },
+      "id": "8f3c7f8f-f4ec-4a2f-8ea9-4b064612cea5",
+      "name": "Structured Output Parser1",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        500,
+        1280
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "da18cb61-1928-4ecc-b5b0-6fd4e8b5358e",
+              "leftValue": "={{ $json.propertyName }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "67e1ca48-9cec-4a39-899d-156e42222c5d",
+      "name": "If2",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -720,
+        1100
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "incr",
+        "key": "state"
+      },
+      "id": "bab85b47-83ee-41c3-be1f-04c458a7499a",
+      "name": "Redis",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        820,
+        680
+      ],
+      "credentials": {
+        "redis": {
+          "id": "sFbZOCJPhzmLqkni",
+          "name": "Redis account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "state"
+      },
+      "id": "63c07d52-f05b-4186-8484-766852768066",
+      "name": "Redis1",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        2180,
+        1240
+      ],
+      "credentials": {
+        "redis": {
+          "id": "sFbZOCJPhzmLqkni",
+          "name": "Redis account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "key": "state",
+        "options": {}
+      },
+      "id": "d98e115f-caf7-4d61-a32f-c9b3caa24748",
+      "name": "Redis2",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1020,
+        1220
+      ],
+      "credentials": {
+        "redis": {
+          "id": "sFbZOCJPhzmLqkni",
+          "name": "Redis account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "c086413e-ad9e-4aa5-af93-93ecf5dce29e",
+      "name": "Respond to Webhook1",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        680,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.Intent }}",
+                    "rightValue": "become_supplier",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "e941f556-0ef1-46a5-882b-546c60e28c74",
+                    "leftValue": "={{ $json.Intent }}",
+                    "rightValue": "get_prices",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "3ad9df3d-8394-4f02-b0a4-a0640e7c5c6b",
+                    "leftValue": "={{ $json.Intent }}",
+                    "rightValue": "request_callback",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "5cc611b3-f8f6-424f-a8ca-5f9fda38fae5",
+                    "leftValue": "={{ $json.Intent }}",
+                    "rightValue": "give_quotes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "fefc2619-59fb-4f49-89c6-0fa52936f776",
+                    "leftValue": "={{ $json.Intent }}",
+                    "rightValue": "general",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "bf1093ba-6ad2-4ce2-b543-adf6e9d84df6",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        180,
+        940
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "function generateFollowUpQuestion(input) {\n  let data;\n\n  if (Array.isArray(input) && input.length > 0) {\n    data = input[0].output || input[0];\n  } else if (typeof input === 'object') {\n    data = input.output || input;\n  } else {\n    data = { product: input };\n  }\n  \n  // Ensure data is an object\n  if (typeof data !== 'object' || data === null) {\n    data = {};\n  }\n\n  const requiredFields = ['product', 'city'];\n  const missingFields = requiredFields.filter(field => !data[field]);\n\n  if (missingFields.length > 0) {\n    if (missingFields.includes('product')) {\n      return \"What product are you looking for prices on?\";\n    } else if (missingFields.includes('city')) {\n      return `I see you want ${data.product || 'a product'}. To help you narrow your search, could you provide me a city as well?`;\n    }\n  }\n\n  return null;\n}\n\n// Get the input from the previous node\nconst items = $input.all();\n\n// Process each item\nconst output = items.map(item => {\n  let question;\n  try {\n    question = generateFollowUpQuestion(item.json);\n  } catch (error) {\n    question = \"Error processing input: \" + error.message;\n  }\n  \n  return {\n    json: {\n      text: question || \"All required information provided.\"\n    }\n  };\n});\n\nreturn output;"
+      },
+      "id": "05e2c43c-b455-45d8-b286-d755a4099164",
+      "name": "FollowUpQuestion",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2220,
+        580
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "a05c9cff-a5b5-4ae1-a8cb-d62a050004d1",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1480,
+        1060
+      ],
+      "webhookId": "93367215-2b5c-4883-b3a1-2725efb9a515"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('When chat message received').item.json.chatInput }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are an expert in generating JSON structures from natural language commands. You are assigned with recognizing the intent of the user. if the intent is the user requesting a quote return \"give_quotes\", if the intent is to get price of product return \"get_prices\", if the intent is the user wanting a callback return \"request_callback\", if the intent is to be a supplier return \"become_supplier\", unless you are absolutely sure the intent of the user lies in one of the above categories return \"general\". Additionally return the input as it is. Return in JSON object without any wrapper or additional text. "
+            },
+            {
+              "type": "HumanMessagePromptTemplate",
+              "message": "I want quotes for bitumen"
+            },
+            {
+              "type": "AIMessagePromptTemplate",
+              "message": "{|\"input\":\"I want quotes for bitumen\",\"intent\":\"give_quotes\"}"
+            },
+            {
+              "type": "HumanMessagePromptTemplate",
+              "message": "i want prices for pvc in delhi"
+            },
+            {
+              "type": "AIMessagePromptTemplate",
+              "message": "{|{\"input\":\"I want prices for pvc in delhi\",\"intent\": \"get_prices\"}}"
+            },
+            {
+              "type": "HumanMessagePromptTemplate",
+              "message": "Hi how are you"
+            },
+            {
+              "type": "AIMessagePromptTemplate",
+              "message": "{|\"input\":\"Hi how are you\",\"intent\":\"general\"}"
+            }
+          ]
+        }
+      },
+      "id": "449ea968-1cab-49f5-a995-85844154d9e0",
+      "name": "Basic LLM Chain2",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [
+        -500,
+        960
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Initialize an empty array to store the formatted output\nlet formattedOutput = [];\n\n// Loop over input items and format each one\nfor (const item of $input.all()) {\n  const json = item.json;\n  \n  if (json.output) {\n    try {\n      // Parse the JSON string inside the output field\n      const parsedOutput = JSON.parse(json.output);\n      \n      // Create the formatted item with the parsed JSON\n      const formattedItem = {\n        \"output\": parsedOutput\n      };\n      \n      // Append to the formatted output array\n      formattedOutput.push(formattedItem);\n    } catch (e) {\n      // Handle JSON parsing errors\n      console.error(`Failed to parse JSON string: ${e.message}`);\n    }\n  }\n}\n\n// Return the output\nreturn formattedOutput;\n\n"
+      },
+      "id": "72516afd-5fb7-4164-993a-6591fda3f56d",
+      "name": "Code1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1420,
+        860
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Initialize the message\nconst message = \"Hi 👋, I'm Ved AI, the world's first AI for raw materials, here to assist you. You can choose from the options like\\n 1. Get Price\\n 2. Become Supplier\\n 3. Get quotes\\n 4. Request callback\";\n\n// Create the output object\nconst output = [{\n  \"output\": message\n}];\n\n// Return the output\nreturn output;"
+      },
+      "id": "a1aa5c79-b2a6-42b7-82ab-ff53a6a72c3c",
+      "name": "Code3",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1580,
+        1420
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('When chat message received').item.json.chatInput }}",
+        "options": {
+          "systemMessage": "=System: You are an expert in generating JSON structures from natural language commands. Only include the fields that the user has input. Return only the JSON object without any wrapper or additional text.\nHuman: Get the price of polymer by amrit in delhi |JSON:\nAI: {\n{\"product\": \"polymer\",\n\"city\": \"delhi\",\n\"brand\": \"amrit\"}\n}\n\nHuman: {\"product\":\"TMT\",\"location\":\"Gurugram\"}"
+        }
+      },
+      "id": "c437aa3c-d633-40c2-92d7-06a46365f8ef",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.6,
+      "position": [
+        920,
+        1000
+      ]
+    }
+  ],
+  "connections": {
+    "Transform Data3": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Basic LLM Chain2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Transform Data3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "FollowUpQuestion",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Redis1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain2",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis2": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Redis",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        null,
+        null,
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FollowUpQuestion": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Redis2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {}
+}
