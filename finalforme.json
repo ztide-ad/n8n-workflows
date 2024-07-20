@@ -1,0 +1,1352 @@
+{
+  "meta": {
+    "instanceId": "d102396db5484ae5f2c74878bd7e78c14986a880d4ae36aa99666b1a0badfa4c"
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "1d43babe-04b9-4d6c-8fcd-bbb46b0403c5",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        3320,
+        1560
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputData = items[0].json.data.content;\n\nconst transformedData = inputData.map(item => {\n  return {\n    country: item.country,\n    oasysCategoryId: item.oasysCategoryId,\n    isGST: item.isGST,\n    locationType: item.locationType,\n    cityId: item.cityId,\n    source: item.source,\n    pricingId: item.pricingId,\n    lastUpdated: item.lastUpdated,\n    score: item.score,\n    uom: item.uom,\n    additionalParameterId: item.additionalParameterId,\n    visibilityFilter: item.visibilityFilter,\n    price: item.price,\n    state: item.state,\n    remarkId: item.remarkId,\n    oasysProductId: item.oasysProductId,\n    brand: item.brand,\n    slug: item.slug,\n    basePrice: item.basePrice,\n    priceChange: item.priceChange,\n    image: item.image,\n    productId: item.productId,\n    index: item.index,\n    productSlug: item.productSlug,\n    categorySlug: item.categorySlug,\n    plantType: item.plantType,\n    tags: item.tags,\n    uniqueName: item.uniqueName,\n    brandId: item.brandId,\n    grade: item.grade,\n    region: item.region,\n    mandiSubtype: item.mandiSubtype,\n    distance: item.distance,\n    city: item.city,\n    displayName: item.displayName,\n    canOrder: item.canOrder,\n    enabled: item.enabled,\n    mandiType: item.mandiType,\n    expiryDate: item.expiryDate,\n    maskedPrice: item.maskedPrice,\n    currency: item.currency,\n    productType: item.productType,\n    priceChangePercent: item.priceChangePercent,\n    live: item.live,\n    product: item.product,\n    gradeId: item.gradeId,\n    currencySymbol: item.currencySymbol,\n    longLoc: item.longLoc,\n    followed: item.followed,\n    productTypeId: item.productTypeId,\n    latLoc: item.latLoc,\n    additionalParameters: item.additionalParameters,\n    category: item.category,\n    categoryId: item.categoryId,\n    remarks: item.remarks,\n    pricingType: item.pricingType\n  };\n});\n\nreturn transformedData.map(data => ({ json: data }));\n"
+      },
+      "id": "80c2a651-a155-41be-8478-119adfe056c2",
+      "name": "Transform Data3",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        2500,
+        1400
+      ],
+      "typeVersion": 1,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ad85887e-3ade-4262-80b6-49b64d950ca9",
+              "name": "Name",
+              "value": "= {{ $('Transform Data3').item.json.displayName }}",
+              "type": "string"
+            },
+            {
+              "id": "4922fd1b-4dbc-4a1b-8cbd-340c346addc1",
+              "name": "Price",
+              "value": "={{ $('Transform Data3').item.json.basePrice }}",
+              "type": "number"
+            },
+            {
+              "id": "e80633db-b666-44af-9815-ed4aea3c0d7a",
+              "name": "Location",
+              "value": "={{ $('Transform Data3').item.json.city }}",
+              "type": "string"
+            },
+            {
+              "id": "bf720d77-cccf-4293-aebf-bcbdd3835d85",
+              "name": "Percent Change",
+              "value": "={{ $('Transform Data3').item.json.priceChangePercent }}",
+              "type": "string"
+            },
+            {
+              "id": "481275b0-438a-4bfa-b7cd-36cdf266a92a",
+              "name": "Price Change",
+              "value": "={{ $('Transform Data3').item.json.priceChange }}",
+              "type": "string"
+            },
+            {
+              "id": "82966dda-ddbf-4851-8bf6-4c12ddcc241e",
+              "name": "UOM",
+              "value": "={{ $('Transform Data3').item.json.uom }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8b4115bc-1d8e-4463-ba15-4f1684c397e6",
+      "name": "Edit Fields3",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2720,
+        1400
+      ]
+    },
+    {
+      "parameters": {
+        "model": "llama3-70b-8192",
+        "options": {
+          "temperature": 0
+        },
+        "requestOptions": {}
+      },
+      "id": "87d35124-2edc-4003-b2c2-a90aa0b84c36",
+      "name": "Groq Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        380,
+        1640
+      ],
+      "credentials": {
+        "groqApi": {
+          "id": "e9evZGkr7935SZOV",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://stg3-bheem.ofbusiness.co.in/api/v2/pricing/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ $json.output.product }}"
+            },
+            {
+              "name": "city",
+              "value": "={{ $json.output.city }}"
+            },
+            {
+              "name": "pageNumber",
+              "value": "0"
+            },
+            {
+              "name": "pageSize",
+              "value": "3"
+            },
+            {
+              "name": "brand",
+              "value": "={{ $json.output.brand }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-ofb-token",
+              "value": "1263736107172167680"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "id": "d0783346-015f-4d4a-be92-9e1e3a9211f4",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2280,
+        1400
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Initialize an empty string to store the formatted output\nlet formattedOutput = \"\\n\";\n\n// Loop over input items and format each one\nfor (const item of $input.all()) {\n  const json = item.json;\n  \n  // Format the price change and percent change\n  const priceChange = json[\"Price Change\"] || \"0\";\n  const percentChange = json[\"Percent Change\"] || \"0\";\n  \n  // Create the formatted string for this item\n  const formattedItem = `${json.Name}\\n${json.Price}/${json.UOM},(${percentChange}% | ${priceChange})\\n${json.Location}\\n\\n`;\n  \n  // Append to the formatted output string\n  formattedOutput += formattedItem;\n}\n\n// Create the final output object\nconst output = [{\n  \"output\": formattedOutput\n}];\n\n// Return the output\nreturn output;"
+      },
+      "id": "b930d546-03ea-4235-a0ed-a421c24caac9",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2900,
+        1400
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "c95ea3ac-2c02-46b3-adc8-2247cf29f45d",
+              "leftValue": "={{ $json.output.product }}",
+              "rightValue": "C",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "8d3c227f-b064-4233-8ecb-fcab891cd0fa",
+              "leftValue": "={{ $json.output.city }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "c8c16055-122f-45dd-9f55-7a78e1f4327b",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        1400
+      ]
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10,
+        "requestOptions": {}
+      },
+      "id": "f11b129b-f15f-4537-ab4f-295eeb88202c",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        1160,
+        1480
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2e32e191-ff58-4524-a4f6-47fe4a823c57",
+              "name": "Intent",
+              "value": "={{ $json.output.intent }}",
+              "type": "string"
+            },
+            {
+              "id": "131c8449-e17d-4126-8027-3b4c485d96eb",
+              "name": "input",
+              "value": "={{ $json.output.input }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "dff924dc-d819-4658-9edc-da344b4d3bcf",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        100,
+        1260
+      ]
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \n  \"input\": \"I want to become a supplier\",\n  \"intent\": \"become_supplier\"\n\n}",
+        "requestOptions": {}
+      },
+      "id": "d612352a-db63-49c0-8c8a-6341b249a976",
+      "name": "Structured Output Parser1",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        -40,
+        1360
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "da18cb61-1928-4ecc-b5b0-6fd4e8b5358e",
+              "leftValue": "={{ $json.exists }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "2c2599c5-0565-4b83-89d7-3bfaca069a9d",
+      "name": "If2",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -560,
+        1400
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://192.168.100.156:5001/intent",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"intent\":\"become_supplier\",\n  \"targetClientId\": \"{{ $('Webhook').item.json.headers['session-id'] }}\"\n}  ",
+        "options": {}
+      },
+      "id": "45233c06-aa37-40be-91e3-155b89f687e7",
+      "name": "HTTP Request1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://192.168.100.156:5001/intent",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"intent\":\"give_quotes\",\n  \"targetClientId\": \"{{ $('Webhook').item.json.headers['session-id'] }}\"\n} ",
+        "options": {}
+      },
+      "id": "339fad0a-674f-4c60-a26c-f5f309f53cf0",
+      "name": "HTTP Request2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1060,
+        860
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://192.168.100.156:5001/intent",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"intent\":\"request_callback\",\n  \"targetClientId\": \"{{ $('Webhook').item.json.headers['session-id'] }}\"\n} ",
+        "options": {}
+      },
+      "id": "d2bf18a5-7c70-41f8-9a2a-b3639b0db287",
+      "name": "HTTP Request3",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1080,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Initialize an empty array to store the formatted output\nlet formattedOutput = [];\n\n// Loop over input items and format each one\nfor (const item of $input.all()) {\n  const json = item.json;\n  \n  if (json.output) {\n    try {\n      // Parse the JSON string inside the output field\n      const parsedOutput = JSON.parse(json.output);\n      \n      // Create the formatted item with the parsed JSON\n      const formattedItem = {\n        \"output\": parsedOutput\n      };\n      \n      // Append to the formatted output array\n      formattedOutput.push(formattedItem);\n    } catch (e) {\n      // Handle JSON parsing errors\n      console.error(`Failed to parse JSON string: ${e.message}`);\n    }\n  }\n}\n\n// Return the output\nreturn formattedOutput;\n\n"
+      },
+      "id": "91a3d383-b9ba-4350-b4fc-7b456887ef97",
+      "name": "Code1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1420,
+        1280
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://192.168.100.156:5001/set-product-cookie",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "product",
+              "value": "={{ $json.output.product }}"
+            },
+            {
+              "name": "sessionId",
+              "value": "={{ $('Webhook').item.json.headers['session-id'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "182aad7b-9bd7-47a6-aa6a-bb3af4825e24",
+      "name": "HTTP Request4",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1920,
+        1080
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Initialize the message\nconst message = \"Hi 👋, I'm OFBChat here to assist you. You can choose from the options like\\n 1. Get Price\\n 2. Become Supplier\\n 3. Get quotes\\n 4. Request callback\";\n\n// Create the output object\nconst output = [{\n  \"output\": message\n}];\n\n// Return the output\nreturn output;"
+      },
+      "id": "57e1bab0-92af-4c2c-82f7-be6055d3057e",
+      "name": "Code3",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3020,
+        2060
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=http://192.168.100.156:5001/key/{{ $json.headers['session-id'] }}",
+        "options": {}
+      },
+      "id": "2718d2a5-71e9-493c-8ba1-c06143cdf047",
+      "name": "HTTP Request5",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -720,
+        1240
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://192.168.100.156:5001/key/{{ $('Webhook').item.json.headers['session-id'] }}",
+        "options": {}
+      },
+      "id": "54862ca3-ca96-4d79-b332-a18bafb7ad37",
+      "name": "HTTP Request6",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        720,
+        1180
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.Intent }}",
+                    "rightValue": "become_supplier",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "e941f556-0ef1-46a5-882b-546c60e28c74",
+                    "leftValue": "={{ $json.Intent }}",
+                    "rightValue": "get_prices",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "3ad9df3d-8394-4f02-b0a4-a0640e7c5c6b",
+                    "leftValue": "={{ $json.Intent }}",
+                    "rightValue": "request_callback",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "5cc611b3-f8f6-424f-a8ca-5f9fda38fae5",
+                    "leftValue": "={{ $json.Intent }}",
+                    "rightValue": "give_quotes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "fefc2619-59fb-4f49-89c6-0fa52936f776",
+                    "leftValue": "={{ $json.Intent }}",
+                    "rightValue": "general",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4afe3489-0998-467a-a052-e7e094f22230",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        320,
+        1240
+      ]
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "=http://192.168.100.156:5001/key/{{ $('Webhook').item.json.headers['session-id'] }}",
+        "options": {}
+      },
+      "id": "dda812f4-5db2-4c8c-90ed-c0aa1526f7ee",
+      "name": "HTTP Request7",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2380,
+        1020
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Initialize the message\nconst message = \"Sorry we could not find the product you requested please ask the price of another product or check out our product catalog\";\n\n// Create the output object\nconst output = [{\n  \"output\": message\n}];\n\n// Return the output\nreturn output;"
+      },
+      "id": "687194a2-2278-4439-a554-787f4173121b",
+      "name": "Code4",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2900,
+        1140
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "ea390f42-da90-4a87-b24d-9f5349e13656",
+              "leftValue": "={{ $json.data.totalPages }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "62f73d10-f2aa-4e2d-938c-0d29b65b8cf2",
+      "name": "If1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2340,
+        1160
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the input data from the previous node\nconst items = $input.all();\n\n// Transform the input array\nconst output = items.map(item => {\n  return {\n    \"output\": item.json.text\n  };\n});\n\n// Return the transformed data\nreturn output;\n"
+      },
+      "id": "40490aff-b791-4bfd-b7dd-0613f891a9bd",
+      "name": "Code2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3000,
+        1580
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Function to generate follow-up questions\nfunction generateFollowUpQuestion(input, topCities) {\n  let data;\n\n  if (Array.isArray(input) && input.length > 0) {\n    data = input[0].output || input[0];\n  } else if (typeof input === 'object') {\n    data = input.output || input;\n  } else {\n    data = { product: input };\n  }\n\n\n  if (typeof data !== 'object' || data === null) {\n    data = {};\n  }\n\n  const requiredFields = ['product', 'city'];\n  const missingFields = requiredFields.filter(field => !data[field]);\n\n  if (missingFields.length > 0) {\n    if (missingFields.includes('city')) {\n      return `To help you narrow your search, could you provide me a city as well? Here are some top cities you might consider: ${topCities.join(', ')}.`;\n    }\n  }\n\n  return null;\n}\n\nconst items = $input.all();\n\nconst topCities = items.map(item => item.json.Cities);\n\n// Process each item\nconst output = items.map(item => {\n  let question;\n  try {\n    question = generateFollowUpQuestion(item.json, topCities);\n  } catch (error) {\n    question = \"Error processing input: \" + error.message;\n  }\n  \n  return {\n    json: {\n      text: question || \"All required information provided.\"\n    }\n  };\n});\n\nreturn output;\n"
+      },
+      "id": "a4aaa1a1-3eec-4498-a53c-e90089372d63",
+      "name": "FollowUpQuestion",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2840,
+        1580
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://stg3-bheem.ofbusiness.co.in/api/v2/pricing/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ $json.output.product }}"
+            },
+            {
+              "name": "pageNumber",
+              "value": "0"
+            },
+            {
+              "name": "pageSize",
+              "value": "20"
+            },
+            {
+              "name": "brand",
+              "value": "={{ $json.output.brand }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-ofb-token",
+              "value": "1263736107172167680"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "id": "7dbf433e-cfb3-4d8d-a5d7-359c8ed287b2",
+      "name": "HTTP Request8",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2120,
+        1580
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputData = items[0].json.data.content;\n\nconst transformedData = inputData.map(item => {\n  return {\n    country: item.country,\n    oasysCategoryId: item.oasysCategoryId,\n    isGST: item.isGST,\n    locationType: item.locationType,\n    cityId: item.cityId,\n    source: item.source,\n    pricingId: item.pricingId,\n    lastUpdated: item.lastUpdated,\n    score: item.score,\n    uom: item.uom,\n    additionalParameterId: item.additionalParameterId,\n    visibilityFilter: item.visibilityFilter,\n    price: item.price,\n    state: item.state,\n    remarkId: item.remarkId,\n    oasysProductId: item.oasysProductId,\n    brand: item.brand,\n    slug: item.slug,\n    basePrice: item.basePrice,\n    priceChange: item.priceChange,\n    image: item.image,\n    productId: item.productId,\n    index: item.index,\n    productSlug: item.productSlug,\n    categorySlug: item.categorySlug,\n    plantType: item.plantType,\n    tags: item.tags,\n    uniqueName: item.uniqueName,\n    brandId: item.brandId,\n    grade: item.grade,\n    region: item.region,\n    mandiSubtype: item.mandiSubtype,\n    distance: item.distance,\n    city: item.city,\n    displayName: item.displayName,\n    canOrder: item.canOrder,\n    enabled: item.enabled,\n    mandiType: item.mandiType,\n    expiryDate: item.expiryDate,\n    maskedPrice: item.maskedPrice,\n    currency: item.currency,\n    productType: item.productType,\n    priceChangePercent: item.priceChangePercent,\n    live: item.live,\n    product: item.product,\n    gradeId: item.gradeId,\n    currencySymbol: item.currencySymbol,\n    longLoc: item.longLoc,\n    followed: item.followed,\n    productTypeId: item.productTypeId,\n    latLoc: item.latLoc,\n    additionalParameters: item.additionalParameters,\n    category: item.category,\n    categoryId: item.categoryId,\n    remarks: item.remarks,\n    pricingType: item.pricingType\n  };\n});\n\nreturn transformedData.map(data => ({ json: data }));\n"
+      },
+      "id": "62b3386b-4585-4276-aedf-62b2317baf33",
+      "name": "Transform Data",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        2300,
+        1580
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ad85887e-3ade-4262-80b6-49b64d950ca9",
+              "name": "Cities",
+              "value": "={{ $json.city }}",
+              "type": "string"
+            },
+            {
+              "id": "c19936cb-455f-4027-9c12-58b1d47a86f6",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c16b3482-782c-4ac0-8412-9edc614d3b5f",
+      "name": "Edit Fields4",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2480,
+        1580
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the input from the previous node\nconst items = $input.all();\n\n// Initialize an array to store unique cities and a set to track city names\nconst uniqueCities = [];\nconst cityNames = new Set();\n\n// Loop through each item\nitems.forEach(city => {\n  // Check if the city name is already in the set\n  if (!cityNames.has(city.json.Cities)) {\n    // If not, add it to the unique cities array and add the name to the set\n    uniqueCities.push(city.json);\n    cityNames.add(city.json.Cities);\n  }\n});\n\n// Return the unique cities array\nreturn uniqueCities.map(city => ({ json: city }));\n"
+      },
+      "id": "e2ddc2be-6d05-4f22-ac19-c3dc6490e568",
+      "name": "Code5",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2660,
+        1580
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "function generateFollowUpQuestion(input) {\n  let data;\n\n  if (Array.isArray(input) && input.length > 0) {\n    data = input[0].output || input[0];\n  } else if (typeof input === 'object') {\n    data = input.output || input;\n  } else {\n    data = { product: input };\n  }\n  \n  // Ensure data is an object\n  if (typeof data !== 'object' || data === null) {\n    data = {};\n  }\n\n  const requiredFields = ['product', 'city'];\n  const missingFields = requiredFields.filter(field => !data[field]);\n\n  if (missingFields.length > 0) {\n    if (missingFields.includes('product')) {\n      return \"What product do you want prices for?\";\n    } \n  }\n\n  return null;\n}\n\n// Get the input from the previous node\nconst items = $input.all();\n\n// Process each item\nconst output = items.map(item => {\n  let question;\n  try {\n    question = generateFollowUpQuestion(item.json);\n  } catch (error) {\n    question = \"Error processing input: \" + error.message;\n  }\n  \n  return {\n    json: {\n      text: question || \"All required information provided.\"\n    }\n  };\n});\n\nreturn output;"
+      },
+      "id": "271eb29e-ce46-45a1-ac71-928bb0de9eee",
+      "name": "FollowUpQuestion1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2120,
+        1800
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the input data from the previous node\nconst items = $input.all();\n\n// Transform the input array\nconst output = items.map(item => {\n  return {\n    \"output\": item.json.text\n  };\n});\n\n// Return the transformed data\nreturn output;\n"
+      },
+      "id": "a79018e7-3ef7-4807-a388-b0e2f239eb20",
+      "name": "Code6",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2920,
+        1820
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Webhook').item.json.query.input }}\n",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are an expert in generating JSON structures from natural language commands. You are assigned with recognizing the intent of the user. if the intent is the user requesting a quote return \"give_quotes\", if the intent is to get price of product return \"get_prices\", if the intent is the user wanting a callback return \"request_callback\", if the intent is to be a supplier return \"become_supplier\", unless you are absolutely sure the intent of the user lies in one of the above categories return \"general\". Additionally return the input as it is. Return in JSON object without any wrapper or additional text. "
+            },
+            {
+              "type": "HumanMessagePromptTemplate",
+              "message": "I want quotes for bitumen"
+            },
+            {
+              "type": "AIMessagePromptTemplate",
+              "message": "{|\"input\":\"I want quotes for bitumen\",\"intent\":\"give_quotes\"}"
+            },
+            {
+              "type": "HumanMessagePromptTemplate",
+              "message": "i want prices for pvc in delhi"
+            },
+            {
+              "type": "AIMessagePromptTemplate",
+              "message": "{|{\"input\":\"I want prices for pvc in delhi\",\"intent\": \"get_prices\"}}"
+            },
+            {
+              "type": "HumanMessagePromptTemplate",
+              "message": "Hi how are you"
+            },
+            {
+              "type": "AIMessagePromptTemplate",
+              "message": "{|\"input\":\"Hi how are you\",\"intent\":\"general\"}"
+            }
+          ]
+        }
+      },
+      "id": "c63316a4-39fa-4297-9d9c-fecdd9fc5992",
+      "name": "Basic LLM Chain2",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [
+        -300,
+        1260
+      ],
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "c95ea3ac-2c02-46b3-adc8-2247cf29f45d",
+              "leftValue": "={{ $json.output.product }}",
+              "rightValue": "C",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "dcbedb8d-5c3a-43de-9683-6c49dea2c2df",
+      "name": "If3",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1660,
+        1520
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "c95ea3ac-2c02-46b3-adc8-2247cf29f45d",
+              "leftValue": "={{ $json.output.city }}",
+              "rightValue": "C",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "b64406cf-15ef-4af5-a3b2-53d708e95b4c",
+      "name": "If4",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1900,
+        1500
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Webhook').item.json.query.input }}\n",
+        "options": {
+          "systemMessage": "=System: You are an expert in generating JSON structures from natural language commands. Only include the fields that the user has input. Return only the JSON object without any wrapper or additional text. IF THE USER DOES NOT PROVIDE CITY PASS ONLY PRODUCT,ONCE CITY IS PROVIDED PASS BOTH CITY AND PRODUCT\nHuman: Get the price of polymer by amrit in delhi |JSON:\nAI: {\n{\"product\": \"polymer\",\n\"city\": \"delhi\",\n\"brand\": \"amrit\"}\n}"
+        }
+      },
+      "id": "5151b169-14f6-4a91-9ce3-e9f02566161e",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.6,
+      "position": [
+        1040,
+        1280
+      ],
+      "executeOnce": true,
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "path": "mypath",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "3405284a-63a7-4d7d-8dea-0b4f0e929abb",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -880,
+        1420
+      ],
+      "webhookId": "9772597c-a067-4036-aba7-12b78e934e49"
+    }
+  ],
+  "connections": {
+    "Transform Data3": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Basic LLM Chain2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain2",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request5": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request6": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code4": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Code4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Transform Data3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FollowUpQuestion": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request8": {
+      "main": [
+        [
+          {
+            "node": "Transform Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform Data": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields4": {
+      "main": [
+        [
+          {
+            "node": "Code5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code5": {
+      "main": [
+        [
+          {
+            "node": "FollowUpQuestion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FollowUpQuestion1": {
+      "main": [
+        [
+          {
+            "node": "Code6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code6": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "FollowUpQuestion1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If4": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {}
+}
