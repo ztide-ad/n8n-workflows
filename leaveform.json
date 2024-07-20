@@ -1,0 +1,270 @@
+{
+    "meta": {
+      "instanceId": "d102396db5484ae5f2c74878bd7e78c14986a880d4ae36aa99666b1a0badfa4c"
+    },
+    "nodes": [
+      {
+        "parameters": {
+          "jsCode": "const axios = require('axios');\n\nasync function processInput(userInput) {\n    const response = await axios.post('http://your-langchain-api-endpoint', {\n        input: userInput,\n    });\n    return response.data;\n}\n\nreturn processInput(items[0].json.input)\n    .then(response => {\n        return {\n            json: response\n        };\n    })\n    .catch(error => {\n        throw new Error(error);\n    });\n"
+        },
+        "id": "6fba2d02-8c80-40be-8fca-6b60ed0f9271",
+        "name": "Code",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1320,
+          460
+        ]
+      },
+      {
+        "parameters": {
+          "model": "mistralai/Mixtral-8x7B-Instruct-v0.1",
+          "options": {},
+          "requestOptions": {}
+        },
+        "id": "d5ef277d-13b8-4ab8-bd22-462b7e137768",
+        "name": "Hugging Face Inference Model",
+        "type": "@n8n/n8n-nodes-langchain.lmOpenHuggingFaceInference",
+        "typeVersion": 1,
+        "position": [
+          800,
+          1300
+        ],
+        "credentials": {
+          "huggingFaceApi": {
+            "id": "JfH31J3umBPA8Xnj",
+            "name": "HuggingFaceApi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "model": "llama3-70b-8192",
+          "options": {},
+          "requestOptions": {}
+        },
+        "id": "0775efae-64ac-4d6a-be2f-e95bf7c656dc",
+        "name": "Groq Chat Model",
+        "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+        "typeVersion": 1,
+        "position": [
+          1960,
+          1360
+        ],
+        "credentials": {
+          "groqApi": {
+            "id": "e9evZGkr7935SZOV",
+            "name": "Groq account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "formId": "BVc8X3Zx"
+        },
+        "id": "521c103c-ac7d-432e-af29-1b2740f34076",
+        "name": "Typeform Trigger",
+        "type": "n8n-nodes-base.typeformTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          700,
+          800
+        ],
+        "webhookId": "95addec8-b787-4b0e-a320-31c9854d2878",
+        "credentials": {
+          "typeformApi": {
+            "id": "VTOsv1OQbOWudAow",
+            "name": "Typeform account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "{\n  \"prompt\": \"User's input: {{ $json['body']['user_input'] }}\",\n  \"chatMessages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a helpful assistant.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Tell me a joke about {{ $json['body']['user_input'] }}\"\n    },\n    {\n      \"role\": \"ai\",\n      \"content\": \"Why don't scientists trust atoms? Because they make up everything!\"\n    }\n  ]\n}\n"
+        },
+        "id": "9e389f44-1299-470d-a9a8-2386f1231e6d",
+        "name": "Basic LLM Chain",
+        "type": "@n8n/n8n-nodes-langchain.chainLlm",
+        "typeVersion": 1.4,
+        "position": [
+          960,
+          1080
+        ]
+      },
+      {
+        "parameters": {
+          "model": "mistralai/Mixtral-8x7B-Instruct-v0.1",
+          "options": {},
+          "requestOptions": {}
+        },
+        "id": "bf68b5c9-382f-43cb-b992-35e5e4af7d4a",
+        "name": "Hugging Face Inference Model1",
+        "type": "@n8n/n8n-nodes-langchain.lmOpenHuggingFaceInference",
+        "typeVersion": 1,
+        "position": [
+          2080,
+          800
+        ],
+        "credentials": {
+          "huggingFaceApi": {
+            "id": "JfH31J3umBPA8Xnj",
+            "name": "HuggingFaceApi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.typeform.com/forms/BVc8X3Zx/responses",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "{\n  \"field_1\": \"{{ $node['Typeform Trigger'].json['field_1'] }}\",\n  \"field_2\": \"{{ $node['Typeform Trigger'].json['field_2'] }}\"\n}\n",
+          "options": {}
+        },
+        "id": "042ff612-96f3-4cbd-8fc1-336026d475ad",
+        "name": "HTTP Request1",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          900,
+          800
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "http://localhost:5000/submit",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={\n  \"days\": \"={{$json[\"days\"]}}\",\n  \"reason\": \"={{$json[\"reason\"]}}\",\n  \"type\": \"={{$json[\"type\"]}}\"\n}",
+          "options": {}
+        },
+        "id": "39ce140d-b702-4837-8543-07ea0ff85a42",
+        "name": "HTTP Request",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1360,
+          820
+        ]
+      },
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "/auto-form-filler",
+          "options": {}
+        },
+        "id": "8cadbfce-28ae-4e13-8f35-af7ff2b1a4f4",
+        "name": "Webhook",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2,
+        "position": [
+          700,
+          1080
+        ],
+        "webhookId": "1f3165cc-c7f6-41d4-8417-6788a045938f"
+      },
+      {
+        "parameters": {},
+        "id": "f9c2be88-1bdd-4e26-a5f5-559bd3c34f99",
+        "name": "When chat message received",
+        "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+        "typeVersion": 1,
+        "position": [
+          1660,
+          1020
+        ],
+        "webhookId": "94b15c3b-cbe2-4dc4-b5e7-869d9a460b6b"
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "id": "c779fbc9-4b84-4073-aaae-e054bb292be0",
+        "name": "AI Agent",
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 1.6,
+        "position": [
+          1940,
+          1060
+        ]
+      }
+    ],
+    "connections": {
+      "Hugging Face Inference Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Basic LLM Chain",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Groq Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Typeform Trigger": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Basic LLM Chain",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When chat message received": {
+        "main": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "pinData": {}
+  }
