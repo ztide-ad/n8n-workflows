@@ -1,0 +1,632 @@
+{
+  "meta": {
+    "instanceId": "d102396db5484ae5f2c74878bd7e78c14986a880d4ae36aa99666b1a0badfa4c"
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "model": "llama3-70b-8192",
+        "options": {
+          "temperature": 0
+        },
+        "requestOptions": {}
+      },
+      "id": "63445042-6295-4c95-9abd-b806c454daff",
+      "name": "Groq Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        2020,
+        1340
+      ],
+      "credentials": {
+        "groqApi": {
+          "id": "e9evZGkr7935SZOV",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2e32e191-ff58-4524-a4f6-47fe4a823c57",
+              "name": "Intent",
+              "value": "={{ $json.output.intent }}",
+              "type": "string"
+            },
+            {
+              "id": "131c8449-e17d-4126-8027-3b4c485d96eb",
+              "name": "city",
+              "value": "={{ $json.output.city }}",
+              "type": "string"
+            },
+            {
+              "id": "e356a76b-330a-4a38-848a-6a35b8f30d12",
+              "name": "product",
+              "value": "={{ $json.output.product }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "dc4ab180-d10a-4bd1-8870-3eb04055f254",
+      "name": "Edit Fields3",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1600,
+        820
+      ]
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \n  \"product\": \"polymer\",\n   \"city\": \"delhi\",\n  \"intent\": \"get_prices\"\n\n}",
+        "requestOptions": {}
+      },
+      "id": "87da955d-2f0b-4aa4-bcd3-84488e763dc5",
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        1380,
+        1240
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "79d6121f-a768-4991-bbeb-b50534f4b18f",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        820
+      ],
+      "webhookId": "c93b6ba9-5b46-4519-9f42-888971ce1510"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "788a4eb9-1930-470e-a64d-3cfa4630b3fd",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        3360,
+        720
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputData = items[0].json.data.content;\n\nconst transformedData = inputData.map(item => {\n  return {\n    country: item.country,\n    oasysCategoryId: item.oasysCategoryId,\n    isGST: item.isGST,\n    locationType: item.locationType,\n    cityId: item.cityId,\n    source: item.source,\n    pricingId: item.pricingId,\n    lastUpdated: item.lastUpdated,\n    score: item.score,\n    uom: item.uom,\n    additionalParameterId: item.additionalParameterId,\n    visibilityFilter: item.visibilityFilter,\n    price: item.price,\n    state: item.state,\n    remarkId: item.remarkId,\n    oasysProductId: item.oasysProductId,\n    brand: item.brand,\n    slug: item.slug,\n    basePrice: item.basePrice,\n    priceChange: item.priceChange,\n    image: item.image,\n    productId: item.productId,\n    index: item.index,\n    productSlug: item.productSlug,\n    categorySlug: item.categorySlug,\n    plantType: item.plantType,\n    tags: item.tags,\n    uniqueName: item.uniqueName,\n    brandId: item.brandId,\n    grade: item.grade,\n    region: item.region,\n    mandiSubtype: item.mandiSubtype,\n    distance: item.distance,\n    city: item.city,\n    displayName: item.displayName,\n    canOrder: item.canOrder,\n    enabled: item.enabled,\n    mandiType: item.mandiType,\n    expiryDate: item.expiryDate,\n    maskedPrice: item.maskedPrice,\n    currency: item.currency,\n    productType: item.productType,\n    priceChangePercent: item.priceChangePercent,\n    live: item.live,\n    product: item.product,\n    gradeId: item.gradeId,\n    currencySymbol: item.currencySymbol,\n    longLoc: item.longLoc,\n    followed: item.followed,\n    productTypeId: item.productTypeId,\n    latLoc: item.latLoc,\n    additionalParameters: item.additionalParameters,\n    category: item.category,\n    categoryId: item.categoryId,\n    remarks: item.remarks,\n    pricingType: item.pricingType\n  };\n});\n\nreturn transformedData.map(data => ({ json: data }));\n"
+      },
+      "id": "930cf6b6-9dd7-4c3e-ade4-65487deca84b",
+      "name": "Transform Data3",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        2740,
+        440
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "url": "https://stg3-bheem.ofbusiness.co.in/api/v2/pricing/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ $json.product }}"
+            },
+            {
+              "name": "city",
+              "value": "={{ $json.city }}"
+            },
+            {
+              "name": "pageNumber",
+              "value": "0"
+            },
+            {
+              "name": "pageSize",
+              "value": "3"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "id": "1a2f688e-aebd-48b4-8f8d-6d27553fcfef",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2520,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Initialize an empty string to store the formatted output\nlet formattedOutput = \"\\n\";\n\n// Loop over input items and format each one\nfor (const item of $input.all()) {\n  const json = item.json;\n  \n  // Format the price change and percent change\n  const priceChange = json[\"Price Change\"] || \"0\";\n  const percentChange = json[\"Percent Change\"] || \"0\";\n  \n  // Create the formatted string for this item\n  const formattedItem = `${json.Name}\\n${json.Price}/${json.UOM},(${percentChange}% | ${priceChange})\\n${json.Location}\\n\\n`;\n  \n  // Append to the formatted output string\n  formattedOutput += formattedItem;\n}\n\n// Create the final output object\nconst output = [{\n  \"output\": formattedOutput\n}];\n\n// Return the output\nreturn output;"
+      },
+      "id": "56244835-ac72-4310-8d0b-8df6992a8e08",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3140,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "c95ea3ac-2c02-46b3-adc8-2247cf29f45d",
+              "leftValue": "={{ $json.product }}",
+              "rightValue": "C",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "8d3c227f-b064-4233-8ecb-fcab891cd0fa",
+              "leftValue": "={{ $json.city }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "369e5a74-d705-4fb9-81e5-79f6c8065e5a",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2120,
+        660
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the input data from the previous node\nconst items = $input.all();\n\n// Transform the input array\nconst output = items.map(item => {\n  return {\n    \"output\": item.json.text\n  };\n});\n\n// Return the transformed data\nreturn output;\n"
+      },
+      "id": "e606bd30-ece2-479e-b8ed-dcb91fe7b443",
+      "name": "Code2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2920,
+        840
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ad85887e-3ade-4262-80b6-49b64d950ca9",
+              "name": "Name",
+              "value": "={{ $json.displayName }}",
+              "type": "string"
+            },
+            {
+              "id": "4922fd1b-4dbc-4a1b-8cbd-340c346addc1",
+              "name": "Price",
+              "value": "={{ $json.basePrice }}",
+              "type": "number"
+            },
+            {
+              "id": "e80633db-b666-44af-9815-ed4aea3c0d7a",
+              "name": "Location",
+              "value": "={{ $json.city }}",
+              "type": "string"
+            },
+            {
+              "id": "bf720d77-cccf-4293-aebf-bcbdd3835d85",
+              "name": "Percent Change",
+              "value": "={{ $json.priceChangePercent }}",
+              "type": "string"
+            },
+            {
+              "id": "481275b0-438a-4bfa-b7cd-36cdf266a92a",
+              "name": "Price Change",
+              "value": "={{ $json.basePrice }}",
+              "type": "string"
+            },
+            {
+              "id": "82966dda-ddbf-4851-8bf6-4c12ddcc241e",
+              "name": "UOM",
+              "value": "={{ $json.uom }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b6c2e9f5-2005-4454-9c52-34133e8d86ae",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2940,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.Intent }}",
+                    "rightValue": "become_supplier",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "e941f556-0ef1-46a5-882b-546c60e28c74",
+                    "leftValue": "={{ $json.Intent }}",
+                    "rightValue": "get_prices",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "3ad9df3d-8394-4f02-b0a4-a0640e7c5c6b",
+                    "leftValue": "={{ $json.Intent }}",
+                    "rightValue": "request_callback",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "5cc611b3-f8f6-424f-a8ca-5f9fda38fae5",
+                    "leftValue": "={{ $json.Intent }}",
+                    "rightValue": "give_quote",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "fefc2619-59fb-4f49-89c6-0fa52936f776",
+                    "leftValue": "={{ $json.Intent }}",
+                    "rightValue": "general",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "87cd8305-1059-44ee-ba37-918c650d8860",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        1800,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are an expert in generating JSON structures from natural language commands. You are assigned with recognizing the intent of the user. if the intent is quotes for a product return \"give_quotes\", if the intent is to get price of product return \"get_prices\", if the intent is callback return \"request_callback\", if the intent is to be a supplier return \"become_supplier\", unless you are absolutely sure return \"general\". Return in JSON object without any wrapper or additional text. "
+            },
+            {
+              "type": "HumanMessagePromptTemplate",
+              "message": "I want quotes for bitumen"
+            },
+            {
+              "type": "AIMessagePromptTemplate",
+              "message": "{\n\"product\":\"bitumen\"\n\"intent\":\"give_quotes\"\n}\n"
+            },
+            {
+              "type": "HumanMessagePromptTemplate",
+              "message": "i want prices for bitumen"
+            },
+            {
+              "type": "AIMessagePromptTemplate",
+              "message": "{|{\"product\": \"polymer\",\"city\": \"delhi\",\"intent\": \"get_prices\"}}"
+            }
+          ]
+        }
+      },
+      "id": "ec72d2af-4a7e-4376-aa61-01cb71f609af",
+      "name": "Basic LLM Chain1",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [
+        1220,
+        820
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.Intent }} of {{ $json.product }} in  {{ $json.city }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "Your work is to ensure that the user has entered the product and location. The input you get won't have all these so you have to specifically ask the user for the field that they have not given. "
+            },
+            {
+              "type": "HumanMessagePromptTemplate",
+              "message": "=Get the prices of {{ $json.product }}"
+            },
+            {
+              "type": "AIMessagePromptTemplate",
+              "message": "It seems that you have entered information only the about the product. Can you please provide the product name along with the location you are looking for?"
+            }
+          ]
+        }
+      },
+      "id": "fdac0449-17ed-4338-9d10-ad3a9598012b",
+      "name": "Basic LLM Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [
+        2580,
+        840
+      ]
+    }
+  ],
+  "connections": {
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform Data3": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Transform Data3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        null,
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {}
+}
