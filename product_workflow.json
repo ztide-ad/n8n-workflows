@@ -1,0 +1,147 @@
+{
+  "meta": {
+    "instanceId": "d102396db5484ae5f2c74878bd7e78c14986a880d4ae36aa99666b1a0badfa4c"
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "const inputData = items[0].json.data.content;\n\nconst transformedData = inputData.map(item => {\n  return {\n    country: item.country,\n    oasysCategoryId: item.oasysCategoryId,\n    isGST: item.isGST,\n    locationType: item.locationType,\n    cityId: item.cityId,\n    source: item.source,\n    pricingId: item.pricingId,\n    lastUpdated: item.lastUpdated,\n    score: item.score,\n    uom: item.uom,\n    additionalParameterId: item.additionalParameterId,\n    visibilityFilter: item.visibilityFilter,\n    price: item.price,\n    state: item.state,\n    remarkId: item.remarkId,\n    oasysProductId: item.oasysProductId,\n    brand: item.brand,\n    slug: item.slug,\n    basePrice: item.basePrice,\n    priceChange: item.priceChange,\n    image: item.image,\n    productId: item.productId,\n    index: item.index,\n    productSlug: item.productSlug,\n    categorySlug: item.categorySlug,\n    plantType: item.plantType,\n    tags: item.tags,\n    uniqueName: item.uniqueName,\n    brandId: item.brandId,\n    grade: item.grade,\n    region: item.region,\n    mandiSubtype: item.mandiSubtype,\n    distance: item.distance,\n    city: item.city,\n    displayName: item.displayName,\n    canOrder: item.canOrder,\n    enabled: item.enabled,\n    mandiType: item.mandiType,\n    expiryDate: item.expiryDate,\n    maskedPrice: item.maskedPrice,\n    currency: item.currency,\n    productType: item.productType,\n    priceChangePercent: item.priceChangePercent,\n    live: item.live,\n    product: item.product,\n    gradeId: item.gradeId,\n    currencySymbol: item.currencySymbol,\n    longLoc: item.longLoc,\n    followed: item.followed,\n    productTypeId: item.productTypeId,\n    latLoc: item.latLoc,\n    additionalParameters: item.additionalParameters,\n    category: item.category,\n    categoryId: item.categoryId,\n    remarks: item.remarks,\n    pricingType: item.pricingType\n  };\n});\n\nreturn transformedData.map(data => ({ json: data }));\n"
+      },
+      "id": "d01264ba-0c50-4045-8237-9563d49c5869",
+      "name": "Transform Data3",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        700,
+        460
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0a80e884-1adb-41b1-b3a5-1f030da1735a",
+              "name": "Country",
+              "value": "={{ $json.country }}",
+              "type": "string"
+            },
+            {
+              "id": "f41ff21a-17ad-4652-bc2f-aed00419ceb0",
+              "name": "State ",
+              "value": "={{ $json.state }}",
+              "type": "string"
+            },
+            {
+              "id": "106bf523-cf53-48c1-a353-98968387d1d0",
+              "name": "Product",
+              "value": "={{ $json.product }}",
+              "type": "string"
+            },
+            {
+              "id": "237a128a-d5fd-4ef8-8837-332948674108",
+              "name": "Price",
+              "value": "={{ $json.basePrice }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b66aea1d-2e67-4bed-8d6f-c433f8ac8706",
+      "name": "Edit Fields3",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        920,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  'response': JSON.stringify($input.all().map(x => x.json))\n}"
+      },
+      "id": "ac925a94-c407-4c25-987b-5a99106eb054",
+      "name": "Stringify For OFB3",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1140,
+        460
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "url": "https://stg3-bheem.ofbusiness.co.in/api/v2/pricing/search?q=bitumen&city=null&brand=null&pageNumber=0&pageSize=20",
+        "options": {}
+      },
+      "id": "022094e5-8df0-4141-b57c-098db5c1284b",
+      "name": "Bitumen Fetch Prices",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        460,
+        460
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {},
+      "id": "05cb45f8-d2cf-4c4d-bdc0-2d956281b4f0",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        260,
+        460
+      ],
+      "notesInFlow": true
+    }
+  ],
+  "connections": {
+    "Transform Data3": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Stringify For OFB3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bitumen Fetch Prices": {
+      "main": [
+        [
+          {
+            "node": "Transform Data3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Bitumen Fetch Prices",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {}
+}
